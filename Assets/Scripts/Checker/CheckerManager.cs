@@ -6,9 +6,11 @@ public class CheckerManager : MonoBehaviour
 {
     public PlayerType Type;
     public float time;
+    public Vector2Int GridPos;
 
-    public void Init(PlayerType type){
+    public void Init(PlayerType type, int i, int j){
         Type = type;
+        GridPos = new Vector2Int(i, j);
     }
 
     void Start(){

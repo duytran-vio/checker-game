@@ -92,9 +92,10 @@ GameObject:
   m_Component:
   - component: {fileID: 7295449783862344577}
   - component: {fileID: 1164286704}
+  - component: {fileID: 5294136469340145385}
   m_Layer: 0
   m_Name: Checker 2
-  m_TagString: Untagged
+  m_TagString: Checker
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -129,6 +130,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Type: 0
   time: 1
+  GridPos: {x: 0, y: 0}
+--- !u!65 &5294136469340145385
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7295449783862344578}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1.5, y: 0.25, z: 1.5}
+  m_Center: {x: 0, y: 0.21, z: 0}
 --- !u!1 &7295449783917089389
 GameObject:
   m_ObjectHideFlags: 0

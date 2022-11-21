@@ -11,7 +11,6 @@ public class SpawnManager : MonoBehaviour
     public static void InitTable(out Transform[,] floors, out Transform[,] checkers){
         InitFloor(out floors);
         InitChecker(out checkers);
-        checkers = null;
     }
 
     private static void InitFloor(out Transform[,] floors){
@@ -49,7 +48,7 @@ public class SpawnManager : MonoBehaviour
                     continue;
                 Vector3 worldPos = GridManager.GetWorldPos(i, j);
                 checkers[i, j] = Instantiate<GameObject>(playerCheckerPrefab, worldPos, Quaternion.identity, checkersObj.transform).transform;
-                checkers[i,j].GetComponent<CheckerManager>().Init(PlayerType.PLAYER);
+                checkers[i,j].GetComponent<CheckerManager>().Init(PlayerType.PLAYER, i, j);
             }
         }
 
@@ -59,7 +58,7 @@ public class SpawnManager : MonoBehaviour
                     continue;
                 Vector3 worldPos = GridManager.GetWorldPos(i, j);
                 checkers[i, j] = Instantiate<GameObject>(oppCheckerPrefab, worldPos, Quaternion.identity, checkersObj.transform).transform;
-                checkers[i,j].GetComponent<CheckerManager>().Init(PlayerType.OPPONENT);
+                checkers[i,j].GetComponent<CheckerManager>().Init(PlayerType.OPPONENT, i, j);
             }
         }
     }
