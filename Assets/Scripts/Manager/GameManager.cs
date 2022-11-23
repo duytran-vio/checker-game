@@ -89,17 +89,35 @@ public class GameManager : MonoSingleton<GameManager>
         }
     }
 
+    private void CheckBecomeQueen(){
+        CheckerManager checkerManager = _currentChecker.GetComponent<CheckerManager>();
+        Debug.Log(checkerManager.Type + " " + checkerManager.Cell);
+        if ((checkerManager.Type == PlayerType.PLAYER && checkerManager.Cell.x == Config.TableSize - 1) 
+            || (checkerManager.Type == PlayerType.OPPONENT && checkerManager.Cell.x == 0)){
+                checkerManager.BecomeQueen();
+            }
+    }
+
     public void OnClickFloor(Transform floor){
         if (_currentChecker == null || !_moveableFloors.Contains(floor)) 
             return;
         CheckerManager checkerManager = _currentChecker.GetComponent<CheckerManager>();
         FloorManager floorManager = floor.GetComponent<FloorManager>();
+
+        //Destroy Opponent Checker
         if (HasCheckerCanKill()){
             Vector2Int destroyedCell = (floorManager.Cell - checkerManager.Cell) / 2 + checkerManager.Cell;
             GridManager.DestroyChecker(destroyedCell);
         }
+
+        //Move
         GridManager.MoveChecker(checkerManager.Cell, floorManager.Cell);
         checkerManager.MoveToCell(floorManager.Cell);
+
+        //Check become queen
+        CheckBecomeQueen();
+
+        //End move
         UnSelectCurrentChecker();
         Change_turn();
     }
