@@ -5,12 +5,12 @@ using UnityEngine;
 public class GameManager : MonoSingleton<GameManager>
 {
     private PlayerType _turn;
-    private Transform _currentChecker;
+    [SerializeField] private Transform _currentChecker;
     private List<Transform> _moveableFloors;
     void Start()
     {
         GridManager.InitGrid();
-        Init();   
+        Init();
     }
 
     // Update is called once per frame
@@ -19,39 +19,48 @@ public class GameManager : MonoSingleton<GameManager>
         InputManager.HandleMouseInput();
     }
 
-    private void Init(){
+    private void Init()
+    {
         _turn = PlayerType.PLAYER;
         _currentChecker = null;
     }
 
-    private void Change_turn(){
+    private void Change_turn()
+    {
         _turn = 1 - _turn;
     }
 
-    private bool isCurrentChecker(Transform checker){
+    private bool isCurrentChecker(Transform checker)
+    {
         return _currentChecker == checker;
     }
 
-    private void UnSelectCurrentChecker(){
+    private void UnSelectCurrentChecker()
+    {
         if (_currentChecker == null) return;
         _currentChecker = null;
-        foreach(Transform floor in _moveableFloors){
+        foreach (Transform floor in _moveableFloors)
+        {
             floor.GetComponent<FloorManager>().ResetFloorColor();
         }
         _moveableFloors = null;
     }
 
-    private void ChangeCurrentChecker(Transform checker){
+    private void ChangeCurrentChecker(Transform checker)
+    {
         _currentChecker = checker;
         CheckerManager checkerManager = checker.GetComponent<CheckerManager>();
         _moveableFloors = GridManager.GetMoveableFloor(checkerManager.GridPos.x, checkerManager.GridPos.y, checkerManager.Type, false);
-        foreach(Transform floor in _moveableFloors){
+        foreach (Transform floor in _moveableFloors)
+        {
             floor.GetComponent<FloorManager>().SelectFloor();
         }
     }
 
-    private void SelectChecker(Transform checker){
-        if (isCurrentChecker(checker)){
+    private void SelectChecker(Transform checker)
+    {
+        if (isCurrentChecker(checker))
+        {
             UnSelectCurrentChecker();
             return;
         }
@@ -60,9 +69,10 @@ public class GameManager : MonoSingleton<GameManager>
         ChangeCurrentChecker(checker);
     }
 
-    public void OnClickChecker(Transform checker){
+    public void OnClickChecker(Transform checker)
+    {
         CheckerManager checkerManager = checker.GetComponent<CheckerManager>();
-        if (_turn != checkerManager.Type) 
+        if (_turn != checkerManager.Type)
             return;
         SelectChecker(checker);
     }
