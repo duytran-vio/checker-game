@@ -174,7 +174,7 @@ GameObject:
   - component: {fileID: 8628028250105832610}
   - component: {fileID: 1974001941}
   - component: {fileID: 6661589233922178328}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Checker 1
   m_TagString: Checker
   m_Icon: {fileID: 0}
@@ -211,7 +211,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Type: 0
   time: 1
-  GridPos: {x: 0, y: 0}
+  Cell: {x: 0, y: 0}
 --- !u!65 &6661589233922178328
 BoxCollider:
   m_ObjectHideFlags: 0

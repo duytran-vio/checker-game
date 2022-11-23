@@ -6,15 +6,23 @@ public class CheckerManager : MonoBehaviour
 {
     public PlayerType Type;
     public float time;
-    public Vector2Int GridPos;
+    public Vector2Int Cell;
+
+    private Renderer _renderer;
 
     public void Init(PlayerType type, int i, int j){
         Type = type;
-        GridPos = new Vector2Int(i, j);
+        Cell = new Vector2Int(i, j);
     }
 
     void Start(){
-        // GoToPosition(GridManager.GetWorldPos(1, 1));
+        _renderer = transform.GetChild(0).GetComponent<Renderer>();
+    }
+
+    public void MoveToCell(Vector2Int newCell){
+        Cell = newCell;
+        Vector3 newPos = GridManager.GetWorldPos(newCell.x, newCell.y);
+        GoToPosition(newPos);
     }
 
     void GoToPosition(Vector3 pos){
@@ -36,6 +44,20 @@ public class CheckerManager : MonoBehaviour
             }
             else
                 yield return null;
+        }
+    }
+
+    public void Fade(){
+        StartCoroutine(FadeCoroutine());
+    }
+
+    IEnumerator FadeCoroutine(){
+        Color c = _renderer.material.color;
+        for (float alpha = 1f; alpha >= 0; alpha -= 0.1f)
+        {
+            c.a = alpha;
+            _renderer.material.color = c;
+            yield return null;
         }
     }
 }
