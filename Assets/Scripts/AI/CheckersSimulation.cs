@@ -8,39 +8,13 @@ using UnityEngine;
 public class CheckersSimulation : MonoBehaviour
 {
 
-    //[System.Serializable]
-    //public class CellRowGridType : CellRow<Array2DEditor> { }
-
-    //[System.Serializable]
-    //public class Board : Array2D<GridType>
-    //{
-    //    [SerializeField]
-    //    CellRowGridType[] cells = new CellRowGridType[Consts.defaultGridSize];
-
-    //    protected override CellRow<GridType> GetCellRow(int idx)
-    //    {
-    //        return cells[idx];
-    //    }
-    //}
-
-    //[SerializeField] Board _mapLogical = new Board();
-
-    //private Matrix GenFromMove(Matrix currentMat, )
-    //{
-
-    //}
+    public (Vector2Int, Vector2Int) Minimax(Transform[,] board, int depth, int turn, int red_best, int black_best)
+    {
+        
+    }
 
     private void OnDrawGizmos()
     {
-        //Vector2 size = _mapLogical.GridSize;
-        //for (int i = 0; i < size.x; i++)
-        //{
-        //    for (int j = 0; j < size.y; j++)
-        //    {
-        //        Vector3 worldPos = GridManager.GetWorldPos(i, j);
 
-
-        //    }
-        //}
     }
 }
