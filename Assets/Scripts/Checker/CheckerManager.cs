@@ -59,5 +59,10 @@ public class CheckerManager : MonoBehaviour
             _renderer.material.color = c;
             yield return null;
         }
+        gameObject.SetActive(false);
+    }
+
+    public void DestroyThisChecker(){
+        Fade();
     }
 }

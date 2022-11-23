@@ -79,4 +79,14 @@ public class GridManager
     public static Transform GetFloor(Vector2Int cell){
         return s_floors[cell.x, cell.y];
     }
+
+    public static Transform GetChecker(Vector2Int cell){
+        return s_checkers[cell.x, cell.y];
+    }
+
+    public static void DestroyChecker(Vector2Int destroyedCell){
+        Transform destroyedChecker = GetChecker(destroyedCell);
+        destroyedChecker.GetComponent<CheckerManager>().DestroyThisChecker();
+        s_checkers[destroyedCell.x, destroyedCell.y] = null;
+    }
 }

@@ -94,6 +94,10 @@ public class GameManager : MonoSingleton<GameManager>
             return;
         CheckerManager checkerManager = _currentChecker.GetComponent<CheckerManager>();
         FloorManager floorManager = floor.GetComponent<FloorManager>();
+        if (HasCheckerCanKill()){
+            Vector2Int destroyedCell = (floorManager.Cell - checkerManager.Cell) / 2 + checkerManager.Cell;
+            GridManager.DestroyChecker(destroyedCell);
+        }
         GridManager.MoveChecker(checkerManager.Cell, floorManager.Cell);
         checkerManager.MoveToCell(floorManager.Cell);
         UnSelectCurrentChecker();
