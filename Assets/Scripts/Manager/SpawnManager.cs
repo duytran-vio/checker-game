@@ -28,6 +28,7 @@ public class SpawnManager : MonoBehaviour
                 Vector3 worldPos = GridManager.GetWorldPos(i, j);
                 GameObject floorPrefab = ((i + j) % 2 == 0) ? whiteFloorPrefab : blackFloorPrefab;
                 floors[i, j] = Instantiate<GameObject>(floorPrefab, worldPos, Quaternion.identity, tableObj.transform).transform;
+                floors[i, j].GetComponent<FloorManager>().Init(i, j);
             }
         }
     }

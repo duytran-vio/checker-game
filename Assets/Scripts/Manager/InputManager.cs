@@ -15,14 +15,13 @@ public class InputManager : MonoBehaviour
         if (Input.GetMouseButtonDown(0)){
             RaycastHit hit;
             Ray ray = s_mainCamera.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(ray, out hit)){
+            if (Physics.Raycast(ray, out hit, float.MaxValue)){
                 Transform obj = hit.transform;
                 if (obj.tag == CheckerTag){
                     GameManager.Instance.OnClickChecker(hit.transform);
                 }
                 else if (obj.tag == FloorTag ){
-                    Debug.Log(FloorTag);
-                    
+                    GameManager.Instance.OnClickFloor(hit.transform);
                 }
             }
         }

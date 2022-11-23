@@ -6,15 +6,21 @@ public class CheckerManager : MonoBehaviour
 {
     public PlayerType Type;
     public float time;
-    public Vector2Int GridPos;
+    public Vector2Int Cell;
 
     public void Init(PlayerType type, int i, int j){
         Type = type;
-        GridPos = new Vector2Int(i, j);
+        Cell = new Vector2Int(i, j);
     }
 
     void Start(){
         // GoToPosition(GridManager.GetWorldPos(1, 1));
+    }
+
+    public void MoveToCell(Vector2Int newCell){
+        Cell = newCell;
+        Vector3 newPos = GridManager.GetWorldPos(newCell.x, newCell.y);
+        GoToPosition(newPos);
     }
 
     void GoToPosition(Vector3 pos){
