@@ -32,12 +32,12 @@ public class CheckerManager : MonoBehaviour
     IEnumerator GoToPositionCoroutine(Vector3 pos){
         int cnt = 0;
         float v = Vector3.Distance(transform.position, pos) / time;
-        Vector3 dir = (pos - transform.position).normalized;
         while (true){
+            Vector3 dir = (pos - transform.position).normalized;
             Vector3 newPos = transform.position + Time.deltaTime * v * dir;
             transform.position = newPos;
             cnt++;
-            if (Vector3.Distance(newPos,pos) <= 0.01f) 
+            if (Vector3.Distance(newPos,pos) <= 0.1f) 
             {
                 transform.position = pos;
                 break;
