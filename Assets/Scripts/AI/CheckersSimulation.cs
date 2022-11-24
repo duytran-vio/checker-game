@@ -74,51 +74,53 @@ public class CheckersSimulation : MonoSingleton<CheckersSimulation>
     {
         if (depth <= 0 || EvaluateWinner(board) != -1)
         {
+            // if leave node reached, static evaluate the board and return the value
             return (EvaluateStaticScore(board, selfPlayer), board);
         }
         // Generate possible moves
         List<Move> moveList = GeneratePossibleMoves(board, currentTurn);
 
-        //Debug.Log($"Simulating board on edge depth {edgeDepth} generates {moveList.Count} moves.");
 
         //Evaluating each move
-        float bestScore = currentTurn == selfPlayer ? float.NegativeInfinity : float.PositiveInfinity;
+
 
         SimulatedCell[,] selectedMove = new SimulatedCell[Config.TableSize, Config.TableSize];
         string pathStr = "";
         int bestIndex = 0;
         bool maximize = currentTurn == selfPlayer;
+        float bestScore = maximize ? float.NegativeInfinity : float.PositiveInfinity;
+
         for (int index = 0; index < moveList.Count; index++)
         {
             Move currentMove = moveList[index];
+
             //Simulate the move on a virtual board
             SimulatedCell[,] boardSimulated = DeepCloneBoard(board);
-
             SimulateCheckerMove(ref boardSimulated, currentMove);
 
-
-            float thisMoveScore;
-            string tempStr = debugStr + $"\nLevel {depth}: {currentMove.ToString()}\n" + LogSimulatedBoard(boardSimulated, Config.TableSize, Config.TableSize);
+            //prepare string for debug log
+            string tempStr = debugStr
+                + $"\nLevel {depth}: {currentMove.ToString()}\n"
+                + LogSimulatedBoard(boardSimulated, Config.TableSize, Config.TableSize);
 
             //Evaluate the board after move
-            (thisMoveScore, _) = Minimax(boardSimulated, depth - 1, alpha, beta, 1 - currentTurn, selfPlayer, tempStr + "\n\n");
+            (float thisMoveScore, _) = Minimax(boardSimulated, depth - 1, alpha, beta, 1 - currentTurn, selfPlayer, tempStr + "\n\n");
 
 
             if (maximize)
             {
-
                 if (thisMoveScore > bestScore)
                 {
                     //Debug.Log($"On my turn ${edgeDepth / 2} switch selected move from {selectedMove.ToString()} - {bestScore} to {currentMove.ToString()} - {thisMoveScore}");
                     selectedMove = boardSimulated;
                     bestScore = thisMoveScore;
-                    pathStr = debugStr + $"\nLevel {depth}: {currentMove.ToString()} of score {bestScore}\n" + LogSimulatedBoard(boardSimulated, Config.TableSize, Config.TableSize);
+                    pathStr = debugStr
+                        + $"\nLevel {depth}: {currentMove.ToString()} of score {bestScore}\n"
+                        + LogSimulatedBoard(boardSimulated, Config.TableSize, Config.TableSize);
                     bestIndex = index;
                 }
                 alpha = Mathf.Max(alpha, bestScore);
                 if (beta <= alpha) break;
-
-
             }
             else
             {
@@ -127,7 +129,9 @@ public class CheckersSimulation : MonoSingleton<CheckersSimulation>
                     //Debug.Log($"On enemy turn ${(edgeDepth - 1) / 2} switch selected move from {selectedMove.ToString()} - {bestScore} to {currentMove.ToString()} - {thisMoveScore}");
                     selectedMove = boardSimulated;
                     bestScore = thisMoveScore;
-                    pathStr = debugStr + $"\nLevel {depth}: {currentMove.ToString()} of score {bestScore}\n" + LogSimulatedBoard(boardSimulated, Config.TableSize, Config.TableSize);
+                    pathStr = debugStr
+                        + $"\nLevel {depth}: {currentMove.ToString()} of score {bestScore}\n"
+                        + LogSimulatedBoard(boardSimulated, Config.TableSize, Config.TableSize);
                     bestIndex = index;
                 }
 
