@@ -37,7 +37,7 @@ public class GameManager : MonoSingleton<GameManager>
 
     private void Change_turn()
     {
-        _turn = 1 - _turn;
+        _turn = Config.SwitchTurn(_turn);
         if (_turn == PlayerType.OPPONENT)
         {
             CheckersSimulation.Instance.AIGetNextMove(4, PlayerType.OPPONENT);

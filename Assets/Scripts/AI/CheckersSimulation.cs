@@ -10,8 +10,7 @@ public class CheckersSimulation : MonoSingleton<CheckersSimulation>
 {
     [SerializeField] private List<Move> _gizmoMoveList;
     [SerializeField] private PlayerType _gizmoCurrentPlayer;
-    [SerializeField] private Vector2Int _fromPos;
-    [SerializeField] private Vector2Int _toPos;
+    [SerializeField] private Move _gizmoSelectedMove;
 
     [SerializeField] private readonly bool _logBestChoice;
     //[SerializeField] private UnityEvent<Transform[,], PlayerType> _boardHeuristic;
@@ -30,8 +29,7 @@ public class CheckersSimulation : MonoSingleton<CheckersSimulation>
 
         Move chosenMove = new Move(fromPos, toPos, selfPlayer);
         Debug.Log($"{chosenMove}");
-        _fromPos = fromPos;
-        _toPos = toPos;
+        _gizmoSelectedMove = chosenMove;
         _gizmoCurrentPlayer = selfPlayer;
         return (fromPos, toPos);
     }
@@ -101,10 +99,10 @@ public class CheckersSimulation : MonoSingleton<CheckersSimulation>
             //prepare string for debug log
             string tempStr = debugStr
                 + $"\nLevel {depth}: {currentMove.ToString()}\n"
-                + LogSimulatedBoard(boardSimulated, Config.TableSize, Config.TableSize);
+                + GenBoardString(boardSimulated, Config.TableSize, Config.TableSize);
 
             //Evaluate the board after move
-            (float thisMoveScore, _) = Minimax(boardSimulated, depth - 1, alpha, beta, 1 - currentTurn, selfPlayer, tempStr + "\n\n");
+            (float thisMoveScore, _) = Minimax(boardSimulated, depth - 1, alpha, beta, Config.SwitchTurn(currentTurn), selfPlayer, tempStr + "\n\n");
 
 
             if (maximize)
@@ -116,7 +114,7 @@ public class CheckersSimulation : MonoSingleton<CheckersSimulation>
                     bestScore = thisMoveScore;
                     pathStr = debugStr
                         + $"\nLevel {depth}: {currentMove.ToString()} of score {bestScore}\n"
-                        + LogSimulatedBoard(boardSimulated, Config.TableSize, Config.TableSize);
+                        + GenBoardString(boardSimulated, Config.TableSize, Config.TableSize);
                     bestIndex = index;
                 }
                 alpha = Mathf.Max(alpha, bestScore);
@@ -131,7 +129,7 @@ public class CheckersSimulation : MonoSingleton<CheckersSimulation>
                     bestScore = thisMoveScore;
                     pathStr = debugStr
                         + $"\nLevel {depth}: {currentMove.ToString()} of score {bestScore}\n"
-                        + LogSimulatedBoard(boardSimulated, Config.TableSize, Config.TableSize);
+                        + GenBoardString(boardSimulated, Config.TableSize, Config.TableSize);
                     bestIndex = index;
                 }
 
@@ -174,8 +172,10 @@ public class CheckersSimulation : MonoSingleton<CheckersSimulation>
         cellToMoveTo.Cell = oldPos;
         checker.Cell = newPos;
 
-        if ((checker.Type == PlayerType.PLAYER && checker.Cell.x == Config.TableSize - 1)
-            || (checker.Type == PlayerType.OPPONENT && checker.Cell.x == 0))
+        if (
+            (checker.Type == PlayerType.PLAYER && checker.Cell.x == Config.TableSize - 1)
+            || (checker.Type == PlayerType.OPPONENT && checker.Cell.x == 0)
+        )
         {
             checker.BecomeQueen();
         }
@@ -194,7 +194,7 @@ public class CheckersSimulation : MonoSingleton<CheckersSimulation>
                     CheckerSimulated piece = board[i, j] as CheckerSimulated;
                     if (piece.Type == player)
                     {
-                        List<Move> possibleMoveByThisChecker = GetMoveableFloor(board, piece, out bool isKillableCached);
+                        List<Move> possibleMoveByThisChecker = GetPossibleMovesOfPiece(board, piece, out bool isKillableCached);
                         if (isKillableCached == true && isKillableMoveList == false)
                         {
                             moveList = (from move in moveList where move.IsKillingMove select move).ToList();
@@ -227,7 +227,7 @@ public class CheckersSimulation : MonoSingleton<CheckersSimulation>
         return ((board[x, y] is CheckerSimulated)) ? 1 : 0;
     }
 
-    private static List<Move> GetMoveableFloor(SimulatedCell[,] board, CheckerSimulated piece, out bool isKillableMoveList)
+    private static List<Move> GetPossibleMovesOfPiece(SimulatedCell[,] board, CheckerSimulated piece, out bool isKillableMoveList)
     {
         int x = piece.Cell.x;
         int y = piece.Cell.y;
@@ -327,7 +327,7 @@ public class CheckersSimulation : MonoSingleton<CheckersSimulation>
         else return 0;
     }
 
-    private static string LogSimulatedBoard(SimulatedCell[,] array, int rows, int cols)
+    private static string GenBoardString(SimulatedCell[,] array, int rows, int cols)
     {
         string ret = "";
         for (int i = cols - 1; i >= 0; i--)
@@ -366,7 +366,7 @@ public class CheckersSimulation : MonoSingleton<CheckersSimulation>
             }
 
             Gizmos.color = _gizmoCurrentPlayer == PlayerType.OPPONENT ? Color.yellow : Color.blue;
-            Gizmos.DrawWireSphere(GridManager.GetWorldPos(_toPos), 1f);
+            Gizmos.DrawWireSphere(GridManager.GetWorldPos(_gizmoSelectedMove.To), 1f);
         }
 
     }
