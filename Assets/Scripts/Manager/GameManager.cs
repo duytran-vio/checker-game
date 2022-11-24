@@ -101,7 +101,7 @@ public class GameManager : MonoSingleton<GameManager>
     public void OnClickChecker(Transform checker)
     {
         CheckerManager checkerManager = checker.GetComponent<CheckerManager>();
-        Debug.Log($"From mouse: {checkerManager.Cell.x}, {checkerManager.Cell.y}");
+        //Debug.Log($"From mouse: {checkerManager.Cell.x}, {checkerManager.Cell.y}");
         if (_turn != checkerManager.Type)
             return;
         bool isShowWarning = HasCheckerCanKill() && !_checkerCanKill.Contains(checker);
@@ -118,7 +118,7 @@ public class GameManager : MonoSingleton<GameManager>
     private void CheckBecomeQueen()
     {
         CheckerManager checkerManager = _currentChecker.GetComponent<CheckerManager>();
-        Debug.Log(checkerManager.Type + " " + checkerManager.Cell);
+        //Debug.Log(checkerManager.Type + " " + checkerManager.Cell);
         if ((checkerManager.Type == PlayerType.PLAYER && checkerManager.Cell.x == Config.TableSize - 1)
             || (checkerManager.Type == PlayerType.OPPONENT && checkerManager.Cell.x == 0))
         {

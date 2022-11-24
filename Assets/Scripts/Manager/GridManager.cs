@@ -8,7 +8,6 @@ public class GridManager
     private static Transform[,] _s_floors;
     private static Transform[,] _s_checkers;
 
-    public static Transform[,] CurrentBoardState => _s_checkers;
     public static SimulatedCell[,] CurrentSimulatedBoardState
     {
         get
