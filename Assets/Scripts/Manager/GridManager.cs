@@ -24,6 +24,11 @@ public class GridManager
         return pos;
     }
 
+    public static Vector3 GetWorldPos(Vector2Int gridPos)
+    {
+        return GetWorldPos(gridPos.x, gridPos.y);
+    }
+
     private static bool CheckPositionInBoard(int x, int y)
     {
         return x >= 0 && x < Config.TableSize && y >= 0 && y < Config.TableSize;
@@ -50,20 +55,25 @@ public class GridManager
         List<Transform> moveableFloors = new List<Transform>();
         List<Transform> killableMove = new List<Transform>();
         // int k = (playerType == PlayerType.PLAYER) ? 1 : -1;
-        for (int i = -1; i <= 1; i++){
-            for(int k = -1; k <= 1; k++){
-                if (i == 0 || k == 0 || !isValid(x + k, y + i)) continue;
+        for (int i = -1; i <= 1; i++)
+        {
+            for (int k = -1; k <= 1; k++)
+            {
+                if (i == 0 || k == 0 || !CheckPositionInBoard(x + k, y + i)) continue;
                 if (!isQueen && ((playerType == PlayerType.PLAYER && k == -1) || (playerType == PlayerType.OPPONENT && k == 1)))
                     continue;
-                if (isCheckerOnCell(x + k, y + i) == 0){
-                    moveableFloors.Add(s_floors[x + k, y + i]);
+                if (IsCheckerOnCell(s_checkers, x + k, y + i) == 0)
+                {
+                    moveableFloors.Add(_s_floors[x + k, y + i]);
                 }
-                if (isCheckerOnCell(x + k, y + i) == 1 && s_checkers[x + k, y + i].GetComponent<CheckerManager>().Type != playerType && isCheckerOnCell(x + k * 2, y + i * 2) == 0){
-                    killableMove.Add(s_floors[x + k * 2, y + i * 2]);
+                if (IsCheckerOnCell(s_checkers, x + k, y + i) == 1 && s_checkers[x + k, y + i].GetComponent<CheckerManager>().Type != playerType && IsCheckerOnCell(s_checkers, x + k * 2, y + i * 2) == 0)
+                {
+                    killableMove.Add(_s_floors[x + k * 2, y + i * 2]);
                 }
             }
         }
-        if (killableMove.Count > 0){
+        if (killableMove.Count > 0)
+        {
             isKillableMoveList = true;
             return killableMove;
         }
@@ -98,8 +108,7 @@ public class GridManager
                     continue;
                 Transform checker = s_checkers[i, j];
                 if (checker.GetComponent<CheckerManager>().Type != type) continue;
-                bool isKillableMoveList = false;
-                GetMoveableFloor(s_checkers, checker, out isKillableMoveList);
+                GetMoveableFloor(s_checkers, checker, out bool isKillableMoveList);
                 if (isKillableMoveList)
                 {
                     checkCanKill.Add(checker);
@@ -114,13 +123,18 @@ public class GridManager
         return _s_floors[cell.x, cell.y];
     }
 
-    public static Transform GetChecker(Vector2Int cell){
-        return s_checkers[cell.x, cell.y];
+    public static Transform GetChecker(Vector2Int cell)
+    {
+        return _s_checkers[cell.x, cell.y];
     }
 
-    public static void DestroyChecker(Vector2Int destroyedCell){
-        Transform destroyedChecker = GetChecker(destroyedCell);
-        destroyedChecker.GetComponent<CheckerManager>().DestroyThisChecker();
+    public static void DestroyChecker(Vector2Int destroyedCell)
+    {
+        DestroyChecker(ref _s_checkers, destroyedCell);
+    }
+
+    public static void DestroyChecker(ref Transform[,] s_checkers, Vector2Int destroyedCell)
+    {
         s_checkers[destroyedCell.x, destroyedCell.y] = null;
     }
 }
