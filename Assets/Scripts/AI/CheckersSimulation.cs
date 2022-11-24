@@ -1,4 +1,3 @@
-using Array2DEditor;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
@@ -58,7 +57,7 @@ public class CheckersSimulation : MonoSingleton<CheckersSimulation>
 
             float thisMoveScore;
             //Evaluate the board after move
-            if (edgeDepth <= 0)
+            if (edgeDepth <= 0 || EvaluateWinner(boardSimulated) != -1)
             {
                 thisMoveScore = EvaluateStaticScore(boardSimulated, selfPlayer);
             }
@@ -238,12 +237,30 @@ public class CheckersSimulation : MonoSingleton<CheckersSimulation>
         return selfScore - enemyScore;
     }
 
-    //private float EvaluatePieceScore(CheckerManager piece, PlayerType playerThisTurn)
-    //{
-    //    bool isEnemy = piece.Type != playerThisTurn;
+    private int EvaluateWinner(SimulatedCell[,] board)
+    {
+        int playerPieceCount = 0, opponentPieceCount = 0;
+        foreach (SimulatedCell cell in board)
+        {
+            if (cell is CheckerSimulated)
+            {
+                CheckerSimulated piece = cell as CheckerSimulated;
+                if (piece.Type == PlayerType.PLAYER)
+                {
+                    playerPieceCount++;
+                    if (opponentPieceCount > 0) return -1;
+                }
+                else
+                {
+                    opponentPieceCount++;
+                    if (playerPieceCount > 0) return -1;
+                }
+            }
+        }
 
-    //    float score = 0;
-    //}
+        if (playerPieceCount == 0) return 1;
+        else return 0;
+    }
 
     private void OnDrawGizmos()
     {
