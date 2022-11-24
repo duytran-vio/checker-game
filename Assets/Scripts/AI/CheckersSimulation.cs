@@ -13,6 +13,7 @@ public class CheckersSimulation : MonoSingleton<CheckersSimulation>
     [SerializeField] private PlayerType _gizmoCurrentPlayerMove;
     [SerializeField] private float _alpha;
     [SerializeField] private float _beta;
+    [SerializeField] private bool _logBestChoice;
     //[SerializeField] private UnityEvent<Transform[,], PlayerType> _boardHeuristic;
 
 
@@ -73,7 +74,7 @@ public class CheckersSimulation : MonoSingleton<CheckersSimulation>
 
 
             float thisMoveScore;
-            string tempStr = debugStr + $"\n{currentMove.ToString()}\n" + LogSimulatedBoard(boardSimulated, Config.TableSize, Config.TableSize);
+            string tempStr = debugStr + $"\nLevel {edgeDepth}: {currentMove.ToString()}\n" + LogSimulatedBoard(boardSimulated, Config.TableSize, Config.TableSize);
             //Evaluate the board after move
             if (edgeDepth <= 0 || EvaluateWinner(boardSimulated) != -1)
             {
@@ -96,7 +97,7 @@ public class CheckersSimulation : MonoSingleton<CheckersSimulation>
                     //Debug.Log($"On my turn ${edgeDepth / 2} switch selected move from {selectedMove.ToString()} - {bestScore} to {currentMove.ToString()} - {thisMoveScore}");
                     selectedMove = currentMove;
                     bestScore = thisMoveScore;
-                    pathStr = debugStr + $"\n{currentMove.ToString()}\n" + LogSimulatedBoard(boardSimulated, Config.TableSize, Config.TableSize);
+                    pathStr = debugStr + $"\nLevel {edgeDepth}: {currentMove.ToString()} of score {bestScore}\n" + LogSimulatedBoard(boardSimulated, Config.TableSize, Config.TableSize);
                     bestIndex = index;
                 }
             }
@@ -107,15 +108,15 @@ public class CheckersSimulation : MonoSingleton<CheckersSimulation>
                     //Debug.Log($"On enemy turn ${(edgeDepth - 1) / 2} switch selected move from {selectedMove.ToString()} - {bestScore} to {currentMove.ToString()} - {thisMoveScore}");
                     selectedMove = currentMove;
                     bestScore = thisMoveScore;
-                    pathStr = debugStr + $"\n{currentMove.ToString()}\n" + LogSimulatedBoard(boardSimulated, Config.TableSize, Config.TableSize);
+                    pathStr = debugStr + $"\nLevel {edgeDepth}: {currentMove.ToString()} of score {bestScore}\n" + LogSimulatedBoard(boardSimulated, Config.TableSize, Config.TableSize);
                     bestIndex = index;
                 }
             }
         }
 
         //if (edgeDepth > 0) Debug.Log($"Edge depth {edgeDepth} simulation choosing {selectedMove.ToString()}.");
-        Debug.Log($"{(maximize ? "Maximize" : "Minimize")} stage {edgeDepth} choose node {bestIndex} of score {bestScore}: \n" + pathStr);
-        _gizmoMoveList.Add(selectedMove);
+        if (_logBestChoice) Debug.Log($"{(maximize ? "Maximize" : "Minimize")} Level {edgeDepth} choose node {bestIndex} of score {bestScore}: \n" + pathStr);
+        //_gizmoMoveList.Add(selectedMove);
 
         return (bestScore, selectedMove);
     }
@@ -141,7 +142,6 @@ public class CheckersSimulation : MonoSingleton<CheckersSimulation>
             || (checker.Type == PlayerType.OPPONENT && checker.Cell.x == 0))
         {
             checker.BecomeQueen();
-            Debug.Log(checker.ToString());
         }
     }
 
@@ -232,31 +232,38 @@ public class CheckersSimulation : MonoSingleton<CheckersSimulation>
 
     private float EvaluateStaticScore(SimulatedCell[,] board, PlayerType selfPlayer)
     {
-        //int selfPieces = 0;
-        //int enemyPieces = 0;
+        int selfPieces = 0;
+        int enemyPieces = 0;
 
-        float selfScore = 0;
-        float enemyScore = 0;
+        int selfQueens = 0;
+        int enemyQueens = 0;
+
+        //float selfScore = 0;
+        //float enemyScore = 0;
 
         foreach (SimulatedCell cell in board)
         {
             if (cell is CheckerSimulated)
             {
                 CheckerSimulated piece = cell as CheckerSimulated;
-                float checkerScore = piece.CalculateSelfWorth(board);
+                //float checkerScore = piece.CalculateSelfWorth(board);
 
                 if (piece.Type == selfPlayer)
                 {
-                    selfScore += checkerScore;
+                    //selfScore += checkerScore;
+                    selfPieces++;
+                    if (piece.IsQueen) selfQueens++;
                 }
                 else
                 {
-                    enemyScore += checkerScore;
+                    //enemyScore += checkerScore;
+                    enemyPieces++;
+                    if (piece.IsQueen) enemyQueens++;
                 }
             }
         }
-        //return selfPieces - enemyPieces;
-        return selfScore - enemyScore;
+        return selfPieces - enemyPieces + (selfQueens - enemyQueens) * 0.5f;
+        //return selfScore - enemyScore;
     }
 
     private int EvaluateWinner(SimulatedCell[,] board)
