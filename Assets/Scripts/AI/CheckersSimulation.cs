@@ -17,9 +17,9 @@ public class CheckersSimulation : MonoSingleton<CheckersSimulation>
     //[SerializeField] private UnityEvent<Transform[,], PlayerType> _boardHeuristic;
 
 
-    public (Vector2Int, Vector2Int) AIGetNextMove(int depth, PlayerType currentTurn, PlayerType selfPlayer)
+    public (Vector2Int, Vector2Int) AIGetNextMove(int depth, PlayerType selfPlayer)
     {
-        return AIGetNextMove(GridManager.CurrentSimulatedBoardState, depth, currentTurn, selfPlayer);
+        return AIGetNextMove(GridManager.CurrentSimulatedBoardState, depth, selfPlayer, selfPlayer);
     }
     public (Vector2Int, Vector2Int) AIGetNextMove(SimulatedCell[,] board, int depth, PlayerType currentTurn, PlayerType selfPlayer)
     {
@@ -28,7 +28,8 @@ public class CheckersSimulation : MonoSingleton<CheckersSimulation>
         (float score, SimulatedCell[,] chosenBoard) = Minimax(board, depth, float.NegativeInfinity, float.PositiveInfinity, currentTurn, selfPlayer);
         (Vector2Int fromPos, Vector2Int toPos) = GetMoveBetweenBoard(board, chosenBoard);
 
-        Debug.Log($"{(selfPlayer == PlayerType.OPPONENT ? "Yellow" : "Black")} moves {fromPos} -> {toPos}");
+        Move chosenMove = new Move(fromPos, toPos, selfPlayer);
+        Debug.Log($"{chosenMove}");
         _fromPos = fromPos;
         _toPos = toPos;
         _gizmoCurrentPlayer = selfPlayer;
@@ -216,21 +217,21 @@ public class CheckersSimulation : MonoSingleton<CheckersSimulation>
         return x >= 0 && x < Config.TableSize && y >= 0 && y < Config.TableSize;
     }
 
-    private static int IsCheckerOnCell(SimulatedCell[,] s_checkers, int x, int y)
+    private static int HasCheckerPiece(SimulatedCell[,] board, int x, int y)
     {
         if (!CheckPositionInBoard(x, y)) return -1;
-        return ((s_checkers[x, y] is CheckerSimulated)) ? 1 : 0;
+        return ((board[x, y] is CheckerSimulated)) ? 1 : 0;
     }
 
-    private static List<Move> GetMoveableFloor(SimulatedCell[,] s_checkers, CheckerSimulated checker, out bool isKillableMoveList)
+    private static List<Move> GetMoveableFloor(SimulatedCell[,] board, CheckerSimulated piece, out bool isKillableMoveList)
     {
-        int x = checker.Cell.x;
-        int y = checker.Cell.y;
-        PlayerType playerType = checker.Type;
-        bool isQueen = checker.IsQueen;
-        List<Move> moveableFloors = new List<Move>();
-        List<Move> killableMove = new List<Move>();
-        // int k = (playerType == PlayerType.PLAYER) ? 1 : -1;
+        int x = piece.Cell.x;
+        int y = piece.Cell.y;
+        PlayerType playerType = piece.Type;
+        bool isQueen = piece.IsQueen;
+        List<Move> normalMoves = new List<Move>();
+        List<Move> killingMoves = new List<Move>();
+
         for (int i = -1; i <= 1; i++)
         {
             for (int k = -1; k <= 1; k++)
@@ -238,27 +239,27 @@ public class CheckersSimulation : MonoSingleton<CheckersSimulation>
                 if (i == 0 || k == 0 || !CheckPositionInBoard(x + k, y + i)) continue;
                 if (!isQueen && ((playerType == PlayerType.PLAYER && k == -1) || (playerType == PlayerType.OPPONENT && k == 1)))
                     continue;
-                if (IsCheckerOnCell(s_checkers, x + k, y + i) == 0)
+                if (HasCheckerPiece(board, x + k, y + i) == 0)
                 {
-                    moveableFloors.Add(new Move(checker.Cell, s_checkers[x + k, i + y].Cell, checker.Type));
+                    normalMoves.Add(new Move(piece.Cell, board[x + k, i + y].Cell, piece.Type));
                 }
-                if (IsCheckerOnCell(s_checkers, x + k, y + i) == 1
+                if (HasCheckerPiece(board, x + k, y + i) == 1
                     &&
-                    ((CheckerSimulated)s_checkers[x + k, y + i]).Type != playerType
+                    ((CheckerSimulated)board[x + k, y + i]).Type != playerType
                     &&
-                    IsCheckerOnCell(s_checkers, x + k * 2, y + i * 2) == 0)
+                    HasCheckerPiece(board, x + k * 2, y + i * 2) == 0)
                 {
-                    killableMove.Add(new Move(checker.Cell, s_checkers[x + k * 2, y + i * 2].Cell, checker.Type));
+                    killingMoves.Add(new Move(piece.Cell, board[x + k * 2, y + i * 2].Cell, piece.Type));
                 }
             }
         }
-        if (killableMove.Count > 0)
+        if (killingMoves.Count > 0)
         {
             isKillableMoveList = true;
-            return killableMove;
+            return killingMoves;
         }
         isKillableMoveList = false;
-        return moveableFloors;
+        return normalMoves;
     }
 
     private float EvaluateStaticScore(SimulatedCell[,] board, PlayerType selfPlayer)
