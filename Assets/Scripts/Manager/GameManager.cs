@@ -40,7 +40,11 @@ public class GameManager : MonoSingleton<GameManager>
         _turn = 1 - _turn;
         if (_turn == PlayerType.OPPONENT)
         {
-            CheckersSimulation.Instance.Minimax(GridManager.CurrentBoardState, 1, _turn, PlayerType.OPPONENT);
+            CheckersSimulation.Instance.AIGetNextMove(GridManager.CurrentSimulatedBoardState, 1, _turn, PlayerType.OPPONENT);
+        }
+        else
+        {
+            CheckersSimulation.Instance.AIGetNextMove(GridManager.CurrentSimulatedBoardState, 1, _turn, PlayerType.PLAYER);
         }
         _checkerCanKill = GridManager.GetCheckerCanKill(_turn);
     }

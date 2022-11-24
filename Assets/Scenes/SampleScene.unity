@@ -221,13 +221,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0d16bf57035dfce4a8b7ba7e6c539e26, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _simulateDepth: 1
   _gizmoMoveList: []
   _gizmoSelectedMove:
     From: {x: 0, y: 0}
     To: {x: 0, y: 0}
     IsKillingMove: 0
-  _gizmoOptimalPath: []
 --- !u!4 &371351393
 Transform:
   m_ObjectHideFlags: 0

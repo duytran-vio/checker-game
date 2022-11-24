@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 public class GridManager
 {
@@ -8,6 +9,28 @@ public class GridManager
     private static Transform[,] _s_checkers;
 
     public static Transform[,] CurrentBoardState => _s_checkers;
+    public static SimulatedCell[,] CurrentSimulatedBoardState
+    {
+        get
+        {
+            SimulatedCell[,] simulatedGrid = new SimulatedCell[Config.TableSize, Config.TableSize];
+            for (int i = 0; i < Config.TableSize; i++)
+            {
+                for (int j = 0; j < Config.TableSize; j++)
+                {
+                    if (_s_checkers[i, j] == null)
+                    {
+                        simulatedGrid[i, j] = new FloorSimulated(_s_floors[i, j].GetComponent<FloorManager>());
+                    }
+                    else
+                    {
+                        simulatedGrid[i, j] = new CheckerSimulated(_s_checkers[i, j].GetComponent<CheckerManager>());
+                    }
+                }
+            }
+            return simulatedGrid;
+        }
+    }
 
     public static void InitGrid()
     {
