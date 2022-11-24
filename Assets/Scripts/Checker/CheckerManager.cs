@@ -7,16 +7,21 @@ public class CheckerManager : MonoBehaviour
     public PlayerType Type;
     public float time;
     public Vector2Int Cell;
+    public bool isQueen;
 
     private Renderer _renderer;
+    private Transform _crow;
 
     public void Init(PlayerType type, int i, int j){
         Type = type;
         Cell = new Vector2Int(i, j);
+        isQueen = false;
+        _crow.gameObject.SetActive(false);
     }
 
-    void Start(){
+    void Awake(){
         _renderer = transform.GetChild(0).GetComponent<Renderer>();
+        _crow = transform.GetChild(1);
     }
 
     public void MoveToCell(Vector2Int newCell){
@@ -59,5 +64,15 @@ public class CheckerManager : MonoBehaviour
             _renderer.material.color = c;
             yield return null;
         }
+        gameObject.SetActive(false);
+    }
+
+    public void DestroyThisChecker(){
+        Fade();
+    }
+
+    public void BecomeQueen(){
+        isQueen = true;
+        _crow.gameObject.SetActive(true);
     }
 }
