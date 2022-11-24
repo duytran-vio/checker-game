@@ -31,6 +31,20 @@ public class GridManager
         }
     }
 
+    public static Transform[,] CurrentRealBoardState => _s_checkers;
+
+    public static Transform GetCell(Vector2Int position)
+    {
+        if (_s_checkers[position.x, position.y] != null)
+        {
+            return _s_checkers[position.x, position.y];
+        }
+        else
+        {
+            return _s_floors[position.x, position.y];
+        }
+    }
+
     public static void InitGrid()
     {
         SpawnManager.InitTable(out _s_floors, out _s_checkers);

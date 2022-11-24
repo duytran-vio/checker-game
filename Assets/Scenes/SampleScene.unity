@@ -202,6 +202,7 @@ GameObject:
   m_Component:
   - component: {fileID: 371351393}
   - component: {fileID: 371351392}
+  - component: {fileID: 371351394}
   m_Layer: 0
   m_Name: Simulation
   m_TagString: Untagged
@@ -222,10 +223,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _gizmoMoveList: []
+  _gizmoCurrentPlayer: 0
   _gizmoSelectedMove:
+    Type: 0
     From: {x: 0, y: 0}
     To: {x: 0, y: 0}
-    IsKillingMove: 0
 --- !u!4 &371351393
 Transform:
   m_ObjectHideFlags: 0
@@ -240,6 +242,19 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &371351394
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 371351391}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 43c3fc593abac054f8026f2c556a972f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _side: 1
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,15 +1,17 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class GameManager : MonoSingleton<GameManager>
 {
-    private PlayerType _turn;
     private Transform _currentChecker;
     private List<Transform> _moveableFloors;
     private List<Transform> _checkerCanKill;
 
-    public PlayerType CurrentTurn => _turn;
+    public static event Action<PlayerType> TurnChanged;
+
+    public PlayerType CurrentTurn { get; private set; }
 
     void Start()
     {
@@ -25,7 +27,7 @@ public class GameManager : MonoSingleton<GameManager>
 
     private void Init()
     {
-        _turn = PlayerType.PLAYER;
+        CurrentTurn = PlayerType.PLAYER;
         _currentChecker = null;
         _checkerCanKill = new List<Transform>();
     }
@@ -37,16 +39,17 @@ public class GameManager : MonoSingleton<GameManager>
 
     private void Change_turn()
     {
-        _turn = Config.SwitchTurn(_turn);
-        if (_turn == PlayerType.OPPONENT)
-        {
-            CheckersSimulation.Instance.AIGetNextMove(4, PlayerType.OPPONENT);
-        }
-        else
-        {
-            CheckersSimulation.Instance.AIGetNextMove(4, PlayerType.PLAYER);
-        }
-        _checkerCanKill = GridManager.GetCheckerCanKill(_turn);
+        CurrentTurn = Config.SwitchTurn(CurrentTurn);
+        TurnChanged.Invoke(CurrentTurn);
+        //if (CurrentTurn == PlayerType.OPPONENT)
+        //{
+        //    CheckersSimulation.Instance.AIGetNextMove(4, PlayerType.OPPONENT);
+        //}
+        //else
+        //{
+        //    CheckersSimulation.Instance.AIGetNextMove(4, PlayerType.PLAYER);
+        //}
+        _checkerCanKill = GridManager.GetCheckerCanKill(CurrentTurn);
     }
 
     private bool IsCurrentChecker(Transform checker)
@@ -102,7 +105,7 @@ public class GameManager : MonoSingleton<GameManager>
     {
         CheckerManager checkerManager = checker.GetComponent<CheckerManager>();
         //Debug.Log($"From mouse: {checkerManager.Cell.x}, {checkerManager.Cell.y}");
-        if (_turn != checkerManager.Type)
+        if (CurrentTurn != checkerManager.Type)
             return;
         bool isShowWarning = HasCheckerCanKill() && !_checkerCanKill.Contains(checker);
         if (isShowWarning)

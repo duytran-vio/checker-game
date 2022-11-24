@@ -5,6 +5,7 @@ using UnityEngine;
 using System;
 using System.Linq;
 using UnityEngine.Events;
+using System.Threading.Tasks;
 
 public class CheckersSimulation : MonoSingleton<CheckersSimulation>
 {
@@ -16,15 +17,15 @@ public class CheckersSimulation : MonoSingleton<CheckersSimulation>
     //[SerializeField] private UnityEvent<Transform[,], PlayerType> _boardHeuristic;
 
 
-    public (Vector2Int, Vector2Int) AIGetNextMove(int depth, PlayerType selfPlayer)
+    public async Task<(Vector2Int, Vector2Int)> AIGetNextMove(int depth, PlayerType selfPlayer)
     {
-        return AIGetNextMove(GridManager.CurrentSimulatedBoardState, depth, selfPlayer, selfPlayer);
+        return await AIGetNextMove(GridManager.CurrentSimulatedBoardState, depth, selfPlayer, selfPlayer);
     }
-    public (Vector2Int, Vector2Int) AIGetNextMove(SimulatedCell[,] board, int depth, PlayerType currentTurn, PlayerType selfPlayer)
+    public async Task<(Vector2Int, Vector2Int)> AIGetNextMove(SimulatedCell[,] board, int depth, PlayerType currentTurn, PlayerType selfPlayer)
     {
         _gizmoMoveList.Clear();
 
-        (float score, SimulatedCell[,] chosenBoard) = Minimax(board, depth, float.NegativeInfinity, float.PositiveInfinity, currentTurn, selfPlayer);
+        (float score, SimulatedCell[,] chosenBoard) = await Minimax(board, depth, float.NegativeInfinity, float.PositiveInfinity, currentTurn, selfPlayer);
         (Vector2Int fromPos, Vector2Int toPos) = GetMoveBetweenBoard(board, chosenBoard);
 
         Move chosenMove = new Move(fromPos, toPos, selfPlayer);
@@ -68,7 +69,7 @@ public class CheckersSimulation : MonoSingleton<CheckersSimulation>
         return boardSimulated;
     }
 
-    private (float, SimulatedCell[,]) Minimax(SimulatedCell[,] board, int depth, float alpha, float beta, PlayerType currentTurn, PlayerType selfPlayer, string debugStr = "")
+    private async Task<(float, SimulatedCell[,])> Minimax(SimulatedCell[,] board, int depth, float alpha, float beta, PlayerType currentTurn, PlayerType selfPlayer, string debugStr = "")
     {
         if (depth <= 0 || EvaluateWinner(board) != -1)
         {
@@ -102,7 +103,7 @@ public class CheckersSimulation : MonoSingleton<CheckersSimulation>
                 + GenBoardString(boardSimulated, Config.TableSize, Config.TableSize);
 
             //Evaluate the board after move
-            (float thisMoveScore, _) = Minimax(boardSimulated, depth - 1, alpha, beta, Config.SwitchTurn(currentTurn), selfPlayer, tempStr + "\n\n");
+            (float thisMoveScore, _) = await Minimax(boardSimulated, depth - 1, alpha, beta, Config.SwitchTurn(currentTurn), selfPlayer, tempStr + "\n\n");
 
 
             if (maximize)
