@@ -8,10 +8,11 @@ public class GameManager : MonoSingleton<GameManager>
     private Transform _currentChecker;
     private List<Transform> _moveableFloors;
     private List<Transform> _checkerCanKill;
+    [SerializeField] private PlayerType _currentTurn = PlayerType.NONE;
 
     public static event Action<PlayerType> TurnChanged;
 
-    public PlayerType CurrentTurn { get; private set; }
+    public PlayerType CurrentTurn { get { return _currentTurn; } private set { _currentTurn = value; } }
 
     void Start()
     {
@@ -30,6 +31,7 @@ public class GameManager : MonoSingleton<GameManager>
         CurrentTurn = PlayerType.PLAYER;
         _currentChecker = null;
         _checkerCanKill = new List<Transform>();
+        TurnChanged?.Invoke(CurrentTurn);
     }
 
     private bool HasCheckerCanKill()
@@ -37,10 +39,10 @@ public class GameManager : MonoSingleton<GameManager>
         return _checkerCanKill.Count > 0;
     }
 
-    private void Change_turn()
+    private void ChangeTurn()
     {
         CurrentTurn = Config.SwitchTurn(CurrentTurn);
-        TurnChanged.Invoke(CurrentTurn);
+        TurnChanged?.Invoke(CurrentTurn);
         //if (CurrentTurn == PlayerType.OPPONENT)
         //{
         //    CheckersSimulation.Instance.AIGetNextMove(4, PlayerType.OPPONENT);
@@ -142,9 +144,8 @@ public class GameManager : MonoSingleton<GameManager>
             Vector2Int destroyedCell = (floorManager.Cell - checkerManager.Cell) / 2 + checkerManager.Cell;
 
             Transform destroyedChecker = GridManager.GetChecker(destroyedCell);
-            destroyedChecker.GetComponent<CheckerManager>().DestroyThisChecker();
-
             GridManager.DestroyChecker(destroyedCell);
+            destroyedChecker.GetComponent<CheckerManager>().DestroyThisChecker();
         }
 
         //Move
@@ -156,7 +157,7 @@ public class GameManager : MonoSingleton<GameManager>
 
         //End move
         UnSelectCurrentChecker();
-        Change_turn();
+        ChangeTurn();
     }
 
 }

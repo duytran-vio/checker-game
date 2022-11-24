@@ -26,7 +26,8 @@ public class CheckersSimulation : MonoSingleton<CheckersSimulation>
         _gizmoMoveList.Clear();
 
         (float score, SimulatedCell[,] chosenBoard) = await Minimax(board, depth, float.NegativeInfinity, float.PositiveInfinity, currentTurn, selfPlayer);
-        (Vector2Int fromPos, Vector2Int toPos) = GetMoveBetweenBoard(board, chosenBoard);
+        (Vector2Int fromPos, Vector2Int toPos) = GetMoveBetweenBoard(board, chosenBoard, currentTurn);
+        //Debug.Log(GenBoardString(board) + "\n\n" + GenBoardString(chosenBoard));
 
         Move chosenMove = new Move(fromPos, toPos, selfPlayer);
         Debug.Log($"{chosenMove}");
@@ -35,7 +36,7 @@ public class CheckersSimulation : MonoSingleton<CheckersSimulation>
         return (fromPos, toPos);
     }
 
-    private static (Vector2Int, Vector2Int) GetMoveBetweenBoard(SimulatedCell[,] fromBoard, SimulatedCell[,] toBoard)
+    private static (Vector2Int, Vector2Int) GetMoveBetweenBoard(SimulatedCell[,] fromBoard, SimulatedCell[,] toBoard, PlayerType turn)
     {
         Vector2Int fromPos = default;
         Vector2Int toPos = default;
@@ -45,9 +46,14 @@ public class CheckersSimulation : MonoSingleton<CheckersSimulation>
             for (int j = 0; j < Config.TableSize; j++)
             {
                 if (toBoard[i, j] is CheckerSimulated && fromBoard[i, j] is FloorSimulated)
+                {
                     toPos = fromBoard[i, j].Cell;
+                }
                 if (fromBoard[i, j] is CheckerSimulated && toBoard[i, j] is FloorSimulated)
-                    fromPos = fromBoard[i, j].Cell;
+                {
+                    CheckerSimulated piece = fromBoard[i, j] as CheckerSimulated;
+                    if (piece.Type == turn) fromPos = piece.Cell;
+                }
             }
         }
         return (fromPos, toPos);
@@ -100,7 +106,7 @@ public class CheckersSimulation : MonoSingleton<CheckersSimulation>
             //prepare string for debug log
             string tempStr = debugStr
                 + $"\nLevel {depth}: {currentMove.ToString()}\n"
-                + GenBoardString(boardSimulated, Config.TableSize, Config.TableSize);
+                + GenBoardString(boardSimulated);
 
             //Evaluate the board after move
             (float thisMoveScore, _) = await Minimax(boardSimulated, depth - 1, alpha, beta, Config.SwitchTurn(currentTurn), selfPlayer, tempStr + "\n\n");
@@ -115,7 +121,7 @@ public class CheckersSimulation : MonoSingleton<CheckersSimulation>
                     bestScore = thisMoveScore;
                     pathStr = debugStr
                         + $"\nLevel {depth}: {currentMove.ToString()} of score {bestScore}\n"
-                        + GenBoardString(boardSimulated, Config.TableSize, Config.TableSize);
+                        + GenBoardString(boardSimulated);
                     bestIndex = index;
                 }
                 alpha = Mathf.Max(alpha, bestScore);
@@ -130,7 +136,7 @@ public class CheckersSimulation : MonoSingleton<CheckersSimulation>
                     bestScore = thisMoveScore;
                     pathStr = debugStr
                         + $"\nLevel {depth}: {currentMove.ToString()} of score {bestScore}\n"
-                        + GenBoardString(boardSimulated, Config.TableSize, Config.TableSize);
+                        + GenBoardString(boardSimulated);
                     bestIndex = index;
                 }
 
@@ -328,9 +334,11 @@ public class CheckersSimulation : MonoSingleton<CheckersSimulation>
         else return 0;
     }
 
-    private static string GenBoardString(SimulatedCell[,] array, int rows, int cols)
+    public static string GenBoardString(SimulatedCell[,] array)
     {
         string ret = "";
+        int rows = array.GetLength(0);
+        int cols = array.GetLength(1);
         for (int i = cols - 1; i >= 0; i--)
         {
             ret += "[";
