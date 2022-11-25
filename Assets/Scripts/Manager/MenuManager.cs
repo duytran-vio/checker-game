@@ -1,0 +1,121 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+using Photon.Pun;
+using System;
+
+public class MenuManager : MonoBehaviourPunCallbacks
+{
+    // Start is called before the first frame update
+    private Transform _mainMenu;
+    private Transform _1PMenu;
+    private Transform _2PMenu;
+
+    private Transform _1PbtnObj;
+    private Transform _2PbtnObj;
+    private Transform _loadingScreen;
+
+    private Transform _easyBtnObj;
+    private Transform _hardBtnObj;
+    private Transform _1PBackBtnObj;
+
+    private Transform _createBtnObj;
+    private Transform _createIdObj;
+    private Transform _joinBtnObj;
+    private Transform _joinIdObj;
+    private Transform _2PBackBtnObj;
+
+    void Start()
+    {
+        _mainMenu = GameObject.Find("Menu").transform;
+        _1PMenu = GameObject.Find("1P Menu").transform;
+        _2PMenu = GameObject.Find("2P Menu").transform;
+
+        _1PbtnObj = _mainMenu.Find("1Pbtn");
+        _2PbtnObj = _mainMenu.Find("2Pbtn");
+        _loadingScreen = GameObject.Find("Loading").transform;
+
+        _easyBtnObj = _1PMenu.Find("Easybtn");
+        _hardBtnObj = _1PMenu.Find("Hardbtn");
+        _1PBackBtnObj = _1PMenu.Find("Backbtn");
+
+        _createBtnObj = _2PMenu.Find("Create/CreateBtn");
+        _createIdObj = _2PMenu.Find("Create/CreateRoomID");
+        _joinBtnObj = _2PMenu.Find("Join/JoinBtn");
+        _joinIdObj = _2PMenu.Find("Join/JoinRoomID");
+        _2PBackBtnObj = _2PMenu.Find("Backbtn");
+
+        ShowMenu();
+        AddButtonListener(_1PbtnObj, Show1PMenu);
+        AddButtonListener(_2PbtnObj, Show2PMenu);
+
+        AddButtonListener(_easyBtnObj, ToAIEasy);
+        AddButtonListener(_hardBtnObj, ToAIHard);
+        AddButtonListener(_1PBackBtnObj, ShowMenu);
+
+        AddButtonListener(_createBtnObj, CreateRoom);
+        AddButtonListener(_joinBtnObj, JoinRoom);
+        AddButtonListener(_2PBackBtnObj, ShowMenu);
+    }
+
+    private void AddButtonListener(Transform btnObj, Action listener){
+        Button btn = btnObj.GetComponent<Button>();
+        btn.onClick.AddListener(() => listener());
+    }
+
+    private void ShowMenu(){
+        _mainMenu.gameObject.SetActive(true);
+        _1PMenu.gameObject.SetActive(false);
+        _2PMenu.gameObject.SetActive(false);
+        _loadingScreen.gameObject.SetActive(false);
+    }
+
+    private void Show1PMenu(){
+        _mainMenu.gameObject.SetActive(false);
+        _1PMenu.gameObject.SetActive(true);
+        _2PMenu.gameObject.SetActive(false);
+        _loadingScreen.gameObject.SetActive(false);
+    }
+
+    private void Show2PMenu(){
+        _mainMenu.gameObject.SetActive(false);
+        _1PMenu.gameObject.SetActive(false);
+        _loadingScreen.gameObject.SetActive(true);
+        PhotonNetwork.ConnectUsingSettings();
+    }
+
+    private void ToAIEasy(){
+
+    }
+
+    private void ToAIHard(){
+
+    }
+
+    public override void OnConnectedToMaster()
+    {
+        PhotonNetwork.JoinLobby();
+    }
+
+    public override void OnJoinedLobby()
+    {
+        _loadingScreen.gameObject.SetActive(false);
+        _2PMenu.gameObject.SetActive(true);
+    }
+
+    private void CreateRoom(){
+        var roomId = _createIdObj.GetComponent<InputField>().text;
+        PhotonNetwork.CreateRoom(roomId);
+    }
+
+    private void JoinRoom(){
+        var roomId = _joinIdObj.GetComponent<InputField>().text;
+        PhotonNetwork.JoinRoom(roomId);
+    }
+
+    public override void OnJoinedRoom()
+    {
+        PhotonNetwork.LoadLevel("2 Players");
+    }
+}

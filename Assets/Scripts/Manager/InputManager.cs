@@ -8,20 +8,21 @@ public class InputManager : MonoBehaviour
     public static string CheckerTag = "Checker";
     public static string FloorTag = "Floor";
 
-    void Awake(){
-        s_mainCamera = GameObject.Find("Main Camera").GetComponent<Camera>();
+    public static void SetCamera(Transform camera){
+        s_mainCamera = camera.GetComponent<Camera>();
     }
-    public static void HandleMouseInput(){
+    
+    public static void HandleMouseInput(PlayerType playerType = PlayerType.NONE){
         if (Input.GetMouseButtonDown(0)){
             RaycastHit hit;
             Ray ray = s_mainCamera.ScreenPointToRay(Input.mousePosition);
             if (Physics.Raycast(ray, out hit, float.MaxValue)){
                 Transform obj = hit.transform;
                 if (obj.tag == CheckerTag){
-                    GameManager.Instance.OnClickChecker(hit.transform);
+                    GameManager.Instance.OnClickChecker(hit.transform, playerType);
                 }
                 else if (obj.tag == FloorTag ){
-                    GameManager.Instance.OnClickFloor(hit.transform);
+                    GameManager.Instance.OnClickFloor(hit.transform, playerType);
                 }
             }
         }

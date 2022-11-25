@@ -13,6 +13,11 @@ public class GameManager : MonoSingleton<GameManager>
     public static event Action<PlayerType> TurnChanged;
 
     public PlayerType CurrentTurn { get { return _currentTurn; } private set { _currentTurn = value; } }
+    private int _thisUserId = -1;
+
+    public void SetThisUserId(int id){
+        _thisUserId = id;
+    }
 
     void Start()
     {
@@ -23,7 +28,9 @@ public class GameManager : MonoSingleton<GameManager>
     // Update is called once per frame
     void Update()
     {
-        InputManager.HandleMouseInput();
+        if (!isOnline()){
+            InputManager.HandleMouseInput(PlayerType.PLAYER);
+        }
     }
 
     private void Init()
@@ -39,8 +46,13 @@ public class GameManager : MonoSingleton<GameManager>
         return _checkerCanKill.Count > 0;
     }
 
+    private void UpdateScore(){
+
+    }
+
     private void ChangeTurn()
     {
+        UpdateScore();
         CurrentTurn = Config.SwitchTurn(CurrentTurn);
         TurnChanged?.Invoke(CurrentTurn);
         //if (CurrentTurn == PlayerType.OPPONENT)
@@ -103,8 +115,10 @@ public class GameManager : MonoSingleton<GameManager>
         }
     }
 
-    public void OnClickChecker(Transform checker)
+    public void OnClickChecker(Transform checker, PlayerType fromPlayerType)
     {
+        // Debug.Log(fromPlayerType + " " + CurrentTurn);
+        if (checker == null || fromPlayerType != CurrentTurn) return;
         CheckerManager checkerManager = checker.GetComponent<CheckerManager>();
         //Debug.Log($"From mouse: {checkerManager.Cell.x}, {checkerManager.Cell.y}");
         if (CurrentTurn != checkerManager.Type)
@@ -131,9 +145,9 @@ public class GameManager : MonoSingleton<GameManager>
         }
     }
 
-    public void OnClickFloor(Transform floor)
+    public void OnClickFloor(Transform floor, PlayerType fromPlayerType)
     {
-        if (_currentChecker == null || !_moveableFloors.Contains(floor))
+        if (fromPlayerType != CurrentTurn || _currentChecker == null || !_moveableFloors.Contains(floor))
             return;
         CheckerManager checkerManager = _currentChecker.GetComponent<CheckerManager>();
         FloorManager floorManager = floor.GetComponent<FloorManager>();
@@ -148,6 +162,10 @@ public class GameManager : MonoSingleton<GameManager>
             destroyedChecker.GetComponent<CheckerManager>().DestroyThisChecker();
         }
 
+        //
+        var fromCell = checkerManager.Cell;
+        var toCell = floorManager.Cell;
+
         //Move
         GridManager.MoveChecker(checkerManager.Cell, floorManager.Cell);
         checkerManager.MoveToCell(floorManager.Cell);
@@ -158,6 +176,19 @@ public class GameManager : MonoSingleton<GameManager>
         //End move
         UnSelectCurrentChecker();
         ChangeTurn();
+
+        if (isOnline()){
+            SendRequest.Instance.SendRequestMovement(_thisUserId, fromPlayerType, fromCell, toCell);
+        }
     }
 
+    private bool isOnline(){
+        return _thisUserId != -1;
+    }
+
+    public void MoveFromNetwork(int userId, PlayerType playerType, Vector2Int fromCell, Vector2Int toCell){
+        if (userId == _thisUserId) return;
+        GameManager.Instance.OnClickChecker(GridManager.GetCell(fromCell), playerType);
+        GameManager.Instance.OnClickFloor(GridManager.GetCell(toCell), playerType);
+    }
 }
