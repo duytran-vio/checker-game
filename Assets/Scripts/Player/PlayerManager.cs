@@ -11,6 +11,11 @@ public class PlayerManager : MonoBehaviour
         photonView = GetComponent<PhotonView>();
         if (photonView.IsMine){
             playerType = PhotonNetwork.IsMasterClient ? PlayerType.PLAYER : PlayerType.OPPONENT;
+            if (PhotonNetwork.IsMasterClient)
+                CameraManager.SetPlayer1Camera();
+            else 
+                CameraManager.SetPlayer2Camera();
+
             GameManager.Instance.SetThisUserId(photonView.ViewID);
         }
     }

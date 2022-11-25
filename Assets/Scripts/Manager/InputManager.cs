@@ -8,9 +8,10 @@ public class InputManager : MonoBehaviour
     public static string CheckerTag = "Checker";
     public static string FloorTag = "Floor";
 
-    void Awake(){
-        s_mainCamera = GameObject.Find("Main Camera").GetComponent<Camera>();
+    public static void SetCamera(Transform camera){
+        s_mainCamera = camera.GetComponent<Camera>();
     }
+    
     public static void HandleMouseInput(PlayerType playerType = PlayerType.NONE){
         if (Input.GetMouseButtonDown(0)){
             RaycastHit hit;
