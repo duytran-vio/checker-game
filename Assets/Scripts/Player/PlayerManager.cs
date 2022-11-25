@@ -9,7 +9,10 @@ public class PlayerManager : MonoBehaviour
     [SerializeField]private PlayerType playerType;
     void Start(){
         photonView = GetComponent<PhotonView>();
-        playerType = PhotonNetwork.IsMasterClient ? PlayerType.PLAYER : PlayerType.OPPONENT;
+        if (photonView.IsMine){
+            playerType = PhotonNetwork.IsMasterClient ? PlayerType.PLAYER : PlayerType.OPPONENT;
+            GameManager.Instance.SetThisUserId(photonView.ViewID);
+        }
     }
 
     void Update(){
