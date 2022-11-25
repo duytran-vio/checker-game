@@ -6,9 +6,11 @@ using UnityEngine;
 public class AIPlayer : MonoBehaviour
 {
     [SerializeField] PlayerType _side;
+    [SerializeField] int depth;
 
     private void Start()
     {
+        depth = PlayerPrefs.GetInt("depth");
         GameManager.TurnChanged += OnTurnChanged;
     }
 
@@ -21,11 +23,10 @@ public class AIPlayer : MonoBehaviour
     {
         if (Application.isPlaying && turn == _side)
         {
-            (var fromPos, var toPos) = await CheckersSimulation.Instance.AIGetNextMove(6, _side);
+            (var fromPos, var toPos) = await CheckersSimulation.Instance.AIGetNextMove(depth, _side);
             await Task.Delay(500);
             //Debug.Log($"{_side} wants to move from {fromPos} to {toPos}.");
 
-            //TO DO: Làm tiếp cho con AI nó đi giùm anh với
             GameManager.Instance.OnClickChecker(GridManager.GetCell(fromPos), _side);
             GameManager.Instance.OnClickFloor(GridManager.GetCell(toPos), _side);
             SimulatedCell[,] temp = GridManager.CurrentSimulatedBoardState;

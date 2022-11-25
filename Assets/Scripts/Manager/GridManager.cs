@@ -173,4 +173,20 @@ public class GridManager
     {
         s_checkers[destroyedCell.x, destroyedCell.y] = null;
     }
+
+    public static void GetCheckerCount(out int playerCheckerCount, out int opponentCheckerCount){
+        playerCheckerCount = 0;
+        opponentCheckerCount = 0;
+        for(int i = 0; i < Config.TableSize; i++){
+            for (int j = 0; j < Config.TableSize; j++){
+                if (_s_checkers[i,j] == null) continue;
+                CheckerManager checkerManager = _s_checkers[i,j].GetComponent<CheckerManager>();
+                if (checkerManager.Type == PlayerType.PLAYER)
+                    playerCheckerCount++;
+                else{
+                    opponentCheckerCount++;
+                }
+            }
+        }
+    }
 }

@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Photon.Pun;
 using System;
+using UnityEngine.SceneManagement;
 
 public class MenuManager : MonoBehaviourPunCallbacks
 {
@@ -18,6 +19,7 @@ public class MenuManager : MonoBehaviourPunCallbacks
 
     private Transform _easyBtnObj;
     private Transform _hardBtnObj;
+    private Transform _quitBtnObj;
     private Transform _1PBackBtnObj;
 
     private Transform _createBtnObj;
@@ -34,6 +36,7 @@ public class MenuManager : MonoBehaviourPunCallbacks
 
         _1PbtnObj = _mainMenu.Find("1Pbtn");
         _2PbtnObj = _mainMenu.Find("2Pbtn");
+        _quitBtnObj = _mainMenu.Find("Quit");
         _loadingScreen = GameObject.Find("Loading").transform;
 
         _easyBtnObj = _1PMenu.Find("Easybtn");
@@ -49,9 +52,10 @@ public class MenuManager : MonoBehaviourPunCallbacks
         ShowMenu();
         AddButtonListener(_1PbtnObj, Show1PMenu);
         AddButtonListener(_2PbtnObj, Show2PMenu);
+        AddButtonListener(_quitBtnObj, OnClickQuitBtn);
 
-        AddButtonListener(_easyBtnObj, ToAIEasy);
-        AddButtonListener(_hardBtnObj, ToAIHard);
+        AddButtonListener(_easyBtnObj, OnClickEasyBtn);
+        AddButtonListener(_hardBtnObj, OnClickHardBtn);
         AddButtonListener(_1PBackBtnObj, ShowMenu);
 
         AddButtonListener(_createBtnObj, CreateRoom);
@@ -85,12 +89,18 @@ public class MenuManager : MonoBehaviourPunCallbacks
         PhotonNetwork.ConnectUsingSettings();
     }
 
-    private void ToAIEasy(){
-
+    private void OnClickEasyBtn(){
+        PlayerPrefs.SetInt("depth", 2);
+        SceneManager.LoadScene("AI Scene");
     }
 
-    private void ToAIHard(){
+    private void OnClickHardBtn(){
+        PlayerPrefs.SetInt("depth", 6);
+        SceneManager.LoadScene("AI Scene");
+    }
 
+    private void OnClickQuitBtn(){
+        Application.Quit();
     }
 
     public override void OnConnectedToMaster()

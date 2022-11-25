@@ -38,6 +38,7 @@ public class GameManager : MonoSingleton<GameManager>
         CurrentTurn = PlayerType.PLAYER;
         _currentChecker = null;
         _checkerCanKill = new List<Transform>();
+        UpdateScore();
         TurnChanged?.Invoke(CurrentTurn);
     }
 
@@ -47,7 +48,8 @@ public class GameManager : MonoSingleton<GameManager>
     }
 
     private void UpdateScore(){
-
+        GridManager.GetCheckerCount(out int playerCheckerCount, out int opponentCheckerCount);
+        UIManager.Instance.UpdateScore(playerCheckerCount, opponentCheckerCount);
     }
 
     private void ChangeTurn()
