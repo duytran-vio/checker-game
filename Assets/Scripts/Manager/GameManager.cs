@@ -39,8 +39,13 @@ public class GameManager : MonoSingleton<GameManager>
         return _checkerCanKill.Count > 0;
     }
 
+    private void UpdateScore(){
+        
+    }
+
     private void ChangeTurn()
     {
+        UpdateScore();
         CurrentTurn = Config.SwitchTurn(CurrentTurn);
         TurnChanged?.Invoke(CurrentTurn);
         //if (CurrentTurn == PlayerType.OPPONENT)
@@ -105,6 +110,8 @@ public class GameManager : MonoSingleton<GameManager>
 
     public void OnClickChecker(Transform checker)
     {
+        Debug.Log(checker);
+        if (checker == null) return;
         CheckerManager checkerManager = checker.GetComponent<CheckerManager>();
         //Debug.Log($"From mouse: {checkerManager.Cell.x}, {checkerManager.Cell.y}");
         if (CurrentTurn != checkerManager.Type)
