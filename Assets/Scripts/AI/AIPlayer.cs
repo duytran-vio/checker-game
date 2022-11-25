@@ -26,8 +26,8 @@ public class AIPlayer : MonoBehaviour
             //Debug.Log($"{_side} wants to move from {fromPos} to {toPos}.");
 
             //TO DO: Làm tiếp cho con AI nó đi giùm anh với
-            GameManager.Instance.OnClickChecker(GridManager.GetCell(fromPos));
-            GameManager.Instance.OnClickFloor(GridManager.GetCell(toPos));
+            GameManager.Instance.OnClickChecker(GridManager.GetCell(fromPos), _side);
+            GameManager.Instance.OnClickFloor(GridManager.GetCell(toPos), _side);
             SimulatedCell[,] temp = GridManager.CurrentSimulatedBoardState;
 
         }

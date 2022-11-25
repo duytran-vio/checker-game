@@ -23,7 +23,7 @@ public class GameManager : MonoSingleton<GameManager>
     // Update is called once per frame
     void Update()
     {
-        InputManager.HandleMouseInput();
+        // InputManager.HandleMouseInput();
     }
 
     private void Init()
@@ -40,7 +40,7 @@ public class GameManager : MonoSingleton<GameManager>
     }
 
     private void UpdateScore(){
-        
+
     }
 
     private void ChangeTurn()
@@ -108,10 +108,10 @@ public class GameManager : MonoSingleton<GameManager>
         }
     }
 
-    public void OnClickChecker(Transform checker)
+    public void OnClickChecker(Transform checker, PlayerType fromPlayerType)
     {
-        Debug.Log(checker);
-        if (checker == null) return;
+        Debug.Log(fromPlayerType + " " + CurrentTurn);
+        if (checker == null || fromPlayerType != CurrentTurn) return;
         CheckerManager checkerManager = checker.GetComponent<CheckerManager>();
         //Debug.Log($"From mouse: {checkerManager.Cell.x}, {checkerManager.Cell.y}");
         if (CurrentTurn != checkerManager.Type)
@@ -138,9 +138,9 @@ public class GameManager : MonoSingleton<GameManager>
         }
     }
 
-    public void OnClickFloor(Transform floor)
+    public void OnClickFloor(Transform floor, PlayerType fromPlayerType)
     {
-        if (_currentChecker == null || !_moveableFloors.Contains(floor))
+        if (fromPlayerType != CurrentTurn || _currentChecker == null || !_moveableFloors.Contains(floor))
             return;
         CheckerManager checkerManager = _currentChecker.GetComponent<CheckerManager>();
         FloorManager floorManager = floor.GetComponent<FloorManager>();
