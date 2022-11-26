@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GameManager : MonoSingleton<GameManager>
 {
@@ -15,6 +16,9 @@ public class GameManager : MonoSingleton<GameManager>
 
     public PlayerType CurrentTurn { get { return _currentTurn; } private set { _currentTurn = value; } }
     private int _thisUserId = -1;
+
+    public Text BlackScoreText;
+    public  Text YellowScoreText;
 
     public void SetThisUserId(int id){
         _thisUserId = id;
@@ -54,7 +58,9 @@ public class GameManager : MonoSingleton<GameManager>
 
     private void UpdateScore(){
         GridManager.GetCheckerCount(out int playerCheckerCount, out int opponentCheckerCount);
-        UIManager.Instance.UpdateScore(playerCheckerCount, opponentCheckerCount);
+        if (BlackScoreText == null || YellowScoreText == null) return;
+        BlackScoreText.text = playerCheckerCount.ToString();
+        YellowScoreText.text = opponentCheckerCount.ToString();
     }
 
     private void ChangeTurn()

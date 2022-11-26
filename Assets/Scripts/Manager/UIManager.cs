@@ -6,8 +6,7 @@ using UnityEngine.SceneManagement;
 
 public class UIManager : MonoSingleton<UIManager>
 {
-    public Text BlackScoreText;
-    public  Text YellowScoreText;
+    
     public Button PauseBtn;
     public Transform PauseMenu;
     public Button SaveBtn;
@@ -15,20 +14,16 @@ public class UIManager : MonoSingleton<UIManager>
     public Button MenuBtn;
 
     void Start(){
-        PauseMenu.gameObject.SetActive(false);
+        PauseMenu?.gameObject.SetActive(false);
         PauseBtn.onClick.AddListener(() => OnClickPause());
-        SaveBtn.onClick.AddListener(() => OnClickSave());
-        ResumeBtn.onClick.AddListener(() => OnClickResume());
-        MenuBtn.onClick.AddListener(() => OnClickMenu());
+        SaveBtn?.onClick.AddListener(() => OnClickSave());
+        ResumeBtn?.onClick.AddListener(() => OnClickResume());
+        MenuBtn?.onClick.AddListener(() => OnClickMenu());
     }
 
-    private void OnClickPause(){
+    public void OnClickPause(){
+        Debug.Log("Pause");
         PauseMenu.gameObject.SetActive(true);
-    }
-
-    public void UpdateScore(int playerScore, int opponentScore){
-        BlackScoreText.text = playerScore.ToString();
-        YellowScoreText.text = opponentScore.ToString();
     }
 
     public void OnClickSave(){
@@ -40,6 +35,7 @@ public class UIManager : MonoSingleton<UIManager>
     }
 
     public void OnClickMenu(){
+        PlayerPrefs.SetString("FromFile","");
         SceneManager.LoadScene("Menu");
     }
 }
