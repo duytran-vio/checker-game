@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 public class SpawnManager : MonoBehaviour
@@ -12,6 +13,12 @@ public class SpawnManager : MonoBehaviour
     {
         InitFloor(out floors);
         InitChecker(out checkers);
+    }
+
+    public static void LoadFromFile(string fromFile, out Transform[,] floors, out Transform[,] checkers)
+    {
+        InitFloor(out floors);
+        LoadTableFromFile(fromFile, out checkers);
     }
 
     private static void InitFloor(out Transform[,] floors)
@@ -71,6 +78,44 @@ public class SpawnManager : MonoBehaviour
                 Vector3 worldPos = GridManager.GetWorldPos(i, j);
                 checkers[i, j] = Instantiate<GameObject>(oppCheckerPrefab, worldPos, Quaternion.identity, checkersObj.transform).transform;
                 checkers[i, j].GetComponent<CheckerManager>().Init(PlayerType.OPPONENT, i, j);
+            }
+        }
+    }
+
+    public static void LoadTableFromFile(string fromFile, out Transform[,] checkers){
+        GameObject checkersObj = GameObject.Find("Checkers");
+        if (checkersObj == null)
+        {
+            checkersObj = new GameObject("Checkers");
+        }
+
+        checkers = new Transform[Config.TableSize, Config.TableSize];
+        GameObject playerCheckerPrefab = Resources.Load<GameObject>(s_playerCheckerPath);
+        GameObject oppCheckerPrefab = Resources.Load<GameObject>(s_oppCheckerPath);
+
+        string file_path = fromFile;
+        StreamReader reader = new StreamReader(file_path);
+        // string temp = reader.ReadLine();
+        // string[] s = temp.Split(' ');
+        
+        
+        for (int i = 0; i < Config.TableSize; i++){
+            for(int j = 0; j < Config.TableSize; j++){
+                string temp = reader.ReadLine();
+                string[] s = temp.Split(' ');
+                int x = (int)System.Convert.ToInt64(s[0]);
+                int y = (int)System.Convert.ToInt64(s[1]);
+                int type = (int)System.Convert.ToInt64(s[2]);
+                if (type == (int)PlayerType.PLAYER){
+                    Vector3 worldPos = GridManager.GetWorldPos(i, j);
+                    checkers[x, y] = Instantiate<GameObject>(playerCheckerPrefab, worldPos, Quaternion.identity, checkersObj.transform).transform;
+                    checkers[x, y].GetComponent<CheckerManager>().Init(PlayerType.PLAYER, x, y);
+                }
+                else if (type == (int)PlayerType.OPPONENT){
+                    Vector3 worldPos = GridManager.GetWorldPos(x, y);
+                    checkers[x, y] = Instantiate<GameObject>(oppCheckerPrefab, worldPos, Quaternion.identity, checkersObj.transform).transform;
+                    checkers[x, y].GetComponent<CheckerManager>().Init(PlayerType.OPPONENT, x, y);
+                }
             }
         }
     }

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using System.IO;
 
 public class GridManager
 {
@@ -45,9 +46,14 @@ public class GridManager
         }
     }
 
-    public static void InitGrid()
+    public static void InitGrid(string fromFile = "")
     {
-        SpawnManager.InitTable(out _s_floors, out _s_checkers);
+        if (fromFile == ""){
+            SpawnManager.InitTable(out _s_floors, out _s_checkers);
+        }
+        else {
+            SpawnManager.LoadFromFile(fromFile, out _s_floors, out _s_checkers);
+        }
     }
 
     public static Vector3 GetWorldPos(int i, int j)
@@ -189,4 +195,9 @@ public class GridManager
             }
         }
     }
+
+    public static Transform[,] GetCurrentTable(){
+        return _s_checkers;
+    }
+
 }

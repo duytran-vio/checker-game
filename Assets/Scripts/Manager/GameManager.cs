@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 public class GameManager : MonoSingleton<GameManager>
@@ -21,7 +22,11 @@ public class GameManager : MonoSingleton<GameManager>
 
     void Start()
     {
-        GridManager.InitGrid();
+        if (PlayerPrefs.GetString("FromFile") == "")
+            GridManager.InitGrid();
+        else 
+            GridManager.InitGrid(PlayerPrefs.GetString("FromFile"));
+
         Init();
     }
 
@@ -192,5 +197,23 @@ public class GameManager : MonoSingleton<GameManager>
         if (userId == _thisUserId) return;
         GameManager.Instance.OnClickChecker(GridManager.GetCell(fromCell), playerType);
         GameManager.Instance.OnClickFloor(GridManager.GetCell(toCell), playerType);
+    }
+
+    public static void SaveCurrentTable(){
+        string save_path = "Assets/Resources/Save/save_" + PlayerPrefs.GetInt("depth").ToString() + ".txt";
+        Debug.Log(save_path);
+        Transform[,] checkers = GridManager.GetCurrentTable();
+        StreamWriter writer = new StreamWriter(save_path, false);
+        for(int i = 0; i < Config.TableSize; i++){
+            for(int j = 0; j < Config.TableSize; j++){
+                if (checkers[i, j] == null) {
+                    writer.WriteLine("" + i + " " + j + " " + (int)PlayerType.NONE);
+                    continue;
+                }
+                CheckerManager checkerManager = checkers[i,j].GetComponent<CheckerManager>();
+                writer.WriteLine("" + i + " " + j + " " + (int)checkerManager.Type);
+            }
+        }
+        writer.Close();
     }
 }
