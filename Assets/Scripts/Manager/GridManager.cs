@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using System.IO;
 
 public class GridManager
 {
@@ -45,9 +46,14 @@ public class GridManager
         }
     }
 
-    public static void InitGrid()
+    public static void InitGrid(string fromFile = "")
     {
-        SpawnManager.InitTable(out _s_floors, out _s_checkers);
+        if (fromFile == ""){
+            SpawnManager.InitTable(out _s_floors, out _s_checkers);
+        }
+        else {
+            SpawnManager.LoadFromFile(fromFile, out _s_floors, out _s_checkers);
+        }
     }
 
     public static Vector3 GetWorldPos(int i, int j)
@@ -173,4 +179,25 @@ public class GridManager
     {
         s_checkers[destroyedCell.x, destroyedCell.y] = null;
     }
+
+    public static void GetCheckerCount(out int playerCheckerCount, out int opponentCheckerCount){
+        playerCheckerCount = 0;
+        opponentCheckerCount = 0;
+        for(int i = 0; i < Config.TableSize; i++){
+            for (int j = 0; j < Config.TableSize; j++){
+                if (_s_checkers[i,j] == null) continue;
+                CheckerManager checkerManager = _s_checkers[i,j].GetComponent<CheckerManager>();
+                if (checkerManager.Type == PlayerType.PLAYER)
+                    playerCheckerCount++;
+                else{
+                    opponentCheckerCount++;
+                }
+            }
+        }
+    }
+
+    public static Transform[,] GetCurrentTable(){
+        return _s_checkers;
+    }
+
 }

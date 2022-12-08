@@ -11,4 +11,8 @@ public class NetworkManager : MonoBehaviour
         PhotonNetwork.Instantiate("Prefabs/Player", Vector3.zero, Quaternion.identity);
     }
 
+    public void Leave(){
+        Debug.Log("Leave Room");
+    }
+
 }
